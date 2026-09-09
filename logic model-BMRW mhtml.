@@ -1,0 +1,17 @@
+CREATE TABLE qualquer coisa 
+( 
+ nome VARCHAR DEFAULT '100',  
+ email VARCHAR,  
+ codigo INT PRIMARY KEY,  
+); 
+
+CREATE TABLE cliente 
+( 
+ cod-cliente INT PRIMARY KEY,  
+ nome completo VARCHAR,  
+ cpf-cliente VARCHAR DEFAULT '14',  
+ idqualquer coisa INT,  
+); 
+
+ALTER TABLE cliente ADD FOREIGN KEY(idqualquer coisa) REFERENCES qualquer coisa (idqualquer coisa)
+
