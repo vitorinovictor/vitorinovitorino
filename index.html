@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotoElite - Concessionária Virtual Premium</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* Header e Navegação */
+        header {
+            background: linear-gradient(180deg, #1a1a1a 0%, #111111 100%);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #e50914;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: #e50914;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #cccccc;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+            background-color: rgba(229, 9, 20, 0.2);
+        }
+
+        nav a.active {
+            background-color: #e50914;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(229, 9, 20, 0.5);
+        }
+
+        .cart-badge {
+            background-color: #ffffff;
+            color: #e50914;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        /* Layout e Conteúdo */
+        .container {
+            max-width: 1250px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            min-height: 70vh;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #888888;
+            font-size: 1.1rem;
+        }
+
+        .page-header::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #e50914;
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Grid de Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .card {
+            background: #181818;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(229, 9, 20, 0.2);
+            border-color: #333333;
+        }
+
+        .card-img-container {
+            width: 100%;
+            height: 230px;
+            overflow: hidden;
+            position: relative;
+            background-color: #050505;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-img-container img {
+            transform: scale(1.08);
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-body {
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: #ffffff;
+        }
+
+        .card-desc {
+            color: #999999;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            line-height: 1.5;
+        }
+
+        .card-specs {
+            display: flex;
+            justify-content: space-between;
+            background: #111111;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: #bbb;
+        }
+
+        .card-specs span strong {
+            color: #ffffff;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .card-price {
+            font-size: 1.5rem;
+            color: #e50914;
+            font-weight: 800;
+        }
+
+        .btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #ff0f1b;
+            box-shadow: 0 6px 15px rgba(229, 9, 20, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Página de Checkout */
+        .checkout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-box {
+            background-color: #181818;
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .checkout-box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 0.8rem;
+        }
+
+        .selected-item-card {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            background: #111111;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+            margin-bottom: 1.5rem;
+        }
+
+        .selected-item-img {
+            width: 120px;
+            height: 80px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #222;
+        }
+
+        .selected-item-info h3 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .selected-item-info p {
+            color: #e50914;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #333333;
+            background-color: #111111;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #080808;
+            padding: 3rem 2rem 1.5rem;
+            margin-top: 5rem;
+            border-top: 1px solid #222222;
+            color: #666666;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .footer-brand h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #e50914;
+        }
+
+        .copyright {
+            border-top: 1px solid #1a1a1a;
+            padding-top: 1.5rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Moto<span>Elite</span></div>
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-btn active" onclick="showPage('esportivas', this)">Esportivas</a></li>
+                <li><a href="#" class="nav-btn" onclick="showPage('custom', this)">Custom</a></li>
+                <li><a href="#" class="nav-btn" onclick="showPage('trail', this)">Big Trail</a></li>
+                <li><a href="#" class="nav-btn" onclick="showPage('naked', this)">Naked</a></li>
+                <li><a href="#" class="nav-btn" onclick="showPage('scooter', this)">Scooters</a></li>
+                <li><a href="#" class="nav-btn" onclick="showPage('carrinho', this)">Carrinho <span class="cart-badge" id="cart-count">0</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- PÁGINA 1: ESPORTIVAS -->
+        <section id="esportivas" class="page active">
+            <div class="page-header">
+                <h1>Motos Esportivas</h1>
+                <p>Máxima performance, aerodinâmica refinada e tecnologia de pista para as ruas.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Superbike</span>
+                        <img src="https://images.unsplash.com/photo-1615172282427-9a57ef2d142e?auto=format&fit=crop&w=800&q=80" alt="Kawasaki Ninja ZX-10R">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Kawasaki Ninja ZX-10R</h3>
+                        <p class="card-desc">Desenvolvida em parceria com a equipe do WorldSBK, oferecendo potência brutal e precisão cirúrgica em curvas.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 998 cc</span>
+                            <span><strong>Potência:</strong> 203 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 115.000</div>
+                            <button class="btn" onclick="buyMoto('Kawasaki Ninja ZX-10R', 115000, 'https://images.unsplash.com/photo-1615172282427-9a57ef2d142e?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Premium</span>
+                        <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80" alt="Ducati Panigale V4">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Ducati Panigale V4 S</h3>
+                        <p class="card-desc">O ápice do design e desempenho italiano. Motor Desmosedici Stradale derivado diretamente da MotoGP.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 1.103 cc</span>
+                            <span><strong>Potência:</strong> 215.5 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 162.000</div>
+                            <button class="btn" onclick="buyMoto('Ducati Panigale V4 S', 162000, 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Tecnologia</span>
+                        <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80" alt="BMW S1000RR">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">BMW S1000RR</h3>
+                        <p class="card-desc">Referência em eletrônica e dinamismo. Equipada com modo Pro e chassi M Frame para agilidade incomparável.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 999 cc</span>
+                            <span><strong>Potência:</strong> 207 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 130.000</div>
+                            <button class="btn" onclick="buyMoto('BMW S1000RR', 130000, 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 2: CUSTOM -->
+        <section id="custom" class="page">
+            <div class="page-header">
+                <h1>Motos Custom</h1>
+                <p>Estilo atemporal, ronco marcante e o verdadeiro espírito de liberdade na estrada.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Lenda</span>
+                        <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80" alt="Harley-Davidson Fat Boy">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Harley-Davidson Fat Boy</h3>
+                        <p class="card-desc">Um ícone moderno com visual imponente, rodas disco de alumínio e o robusto motor Milwaukee-Eight 114.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 1.868 cc</span>
+                            <span><strong>Torque:</strong> 16.1 kgfm</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 125.000</div>
+                            <button class="btn" onclick="buyMoto('Harley-Davidson Fat Boy', 125000, 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Bobber</span>
+                        <img src="https://images.unsplash.com/photo-1558981359-219d6364c9c8?auto=format&fit=crop&w=800&q=80" alt="Indian Scout Bobber">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Indian Scout Bobber</h3>
+                        <p class="card-desc">Perfil rebaixado, visual minimalista 'blacked-out' e performance impressionante para a rodovia.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 1.133 cc</span>
+                            <span><strong>Potência:</strong> 100 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 88.000</div>
+                            <button class="btn" onclick="buyMoto('Indian Scout Bobber', 88000, 'https://images.unsplash.com/photo-1558981359-219d6364c9c8?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Clássica</span>
+                        <img src="https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=800&q=80" alt="Royal Enfield Meteor 350">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Royal Enfield Meteor 350</h3>
+                        <p class="card-desc">A essência do cruzeiro em uma moto ágil, confortável e perfeita tanto para a cidade quanto para passeios de fim de semana.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 349 cc</span>
+                            <span><strong>Potência:</strong> 20.2 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 24.000</div>
+                            <button class="btn" onclick="buyMoto('Royal Enfield Meteor 350', 24000, 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 3: BIG TRAIL -->
+        <section id="trail" class="page">
+            <div class="page-header">
+                <h1>Motos Big Trail</h1>
+                <p>Prontas para qualquer terreno, unindo conforto de longa distância e capacidade off-road.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Aventura</span>
+                        <img src="https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=800&q=80" alt="BMW R 1250 GS">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">BMW R 1250 GS Adventure</h3>
+                        <p class="card-desc">A rainha do segmento. Motor Boxer com tecnologia ShiftCam para entrega perfeita de força em qualquer rota.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 1.254 cc</span>
+                            <span><strong>Potência:</strong> 136 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 110.000</div>
+                            <button class="btn" onclick="buyMoto('BMW R 1250 GS Adventure', 110000, 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Rally</span>
+                        <img src="https://images.unsplash.com/photo-1525160354320-d8e92641c563?auto=format&fit=crop&w=800&q=80" alt="Honda Africa Twin">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Honda CRF 1100L Africa Twin</h3>
+                        <p class="card-desc">Inspirada nos ralis do Dakar, leve, robusta e com opção de transmissão de dupla embreagem (DCT).</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 1.084 cc</span>
+                            <span><strong>Potência:</strong> 99.3 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 95.000</div>
+                            <button class="btn" onclick="buyMoto('Honda CRF 1100L Africa Twin', 95000, 'https://images.unsplash.com/photo-1525160354320-d8e92641c563?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Versátil</span>
+                        <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80" alt="Triumph Tiger 900">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Triumph Tiger 900 Rally Pro</h3>
+                        <p class="card-desc">Motor tricilindrico com ronco característico, suspensão de longo curso e tecnologia de ponta para expedições.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 888 cc</span>
+                            <span><strong>Potência:</strong> 95.2 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 78.000</div>
+                            <button class="btn" onclick="buyMoto('Triumph Tiger 900 Rally Pro', 78000, 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 4: NAKED -->
+        <section id="naked" class="page">
+            <div class="page-header">
+                <h1>Motos Naked</h1>
+                <p>Agilidade urbana, visual agressivo e potência exposta sem carenagens.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Hyper Naked</span>
+                        <img src="https://images.unsplash.com/photo-1547549662-77849a0d8422?auto=format&fit=crop&w=800&q=80" alt="Yamaha MT-09">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Yamaha MT-09</h3>
+                        <p class="card-desc">Conhecida como a 'Master of Torque'. Leveza incomparável e o empolgante motor CP3 tricilíndrico.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 890 cc</span>
+                            <span><strong>Potência:</strong> 119 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 60.000</div>
+                            <button class="btn" onclick="buyMoto('Yamaha MT-09', 60000, 'https://images.unsplash.com/photo-1547549662-77849a0d8422?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Neo Sports</span>
+                        <img src="https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80" alt="Honda CB 1000R">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Honda CB 1000R Black Edition</h3>
+                        <p class="card-desc">Design Neo Sports Café minimalista e sofisticado, combinando um motor tetracilíndrico com acabamento premium.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 998 cc</span>
+                            <span><strong>Potência:</strong> 142.8 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 72.000</div>
+                            <button class="btn" onclick="buyMoto('Honda CB 1000R', 72000, 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Sugomi</span>
+                        <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80" alt="Kawasaki Z900">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Kawasaki Z900</h3>
+                        <p class="card-desc">Entrega de potência emocionante, chassi leve e controle de tração avançado para máximo domínio das ruas.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 948 cc</span>
+                            <span><strong>Potência:</strong> 125 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 65.000</div>
+                            <button class="btn" onclick="buyMoto('Kawasaki Z900', 65000, 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 5: SCOOTERS -->
+        <section id="scooter" class="page">
+            <div class="page-header">
+                <h1>Scooters</h1>
+                <p>Praticidade, baixo consumo e mobilidade urbana com alto nível de conforto.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Maxi Scooter</span>
+                        <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80" alt="Yamaha XMAX 250">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Yamaha XMAX 250</h3>
+                        <p class="card-desc">Espaço porta-objetos sob o banco para dois capacetes, chave presencial e controle de tração de série.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 250 cc</span>
+                            <span><strong>Potência:</strong> 22.8 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 31.000</div>
+                            <button class="btn" onclick="buyMoto('Yamaha XMAX 250', 31000, 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Crossover</span>
+                        <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80" alt="Honda ADV 150">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Honda ADV 150</h3>
+                        <p class="card-desc">Conceito aventureiro urbano com suspensão Showa de longo curso e pneus de uso misto.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 149.3 cc</span>
+                            <span><strong>Potência:</strong> 13.2 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 23.000</div>
+                            <button class="btn" onclick="buyMoto('Honda ADV 150', 23000, 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-img-container">
+                        <span class="card-tag">Vintage</span>
+                        <img src="https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=800&q=80" alt="Vespa GTS 300">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Vespa GTS 300 Super</h3>
+                        <p class="card-desc">O charme clássico italiano alinhado ao motor HPE de alta performance e chassi em aço monocoque.</p>
+                        <div class="card-specs">
+                            <span><strong>Cilindrada:</strong> 278 cc</span>
+                            <span><strong>Potência:</strong> 23.8 cv</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">R$ 55.000</div>
+                            <button class="btn" onclick="buyMoto('Vespa GTS 300 Super', 55000, 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=800&q=80')">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 6: CARRINHO / CHECKOUT -->
+        <section id="carrinho" class="page">
+            <div class="page-header">
+                <h1>Finalizar Aquisição</h1>
+                <p>Preencha os dados abaixo para reservar sua motocicleta com atendimento exclusivo.</p>
+            </div>
+            
+            <div class="checkout-wrapper">
+                <!-- Resumo do Pedido -->
+                <div class="checkout-box">
+                    <h2>Resumo da Moto</h2>
+                    <div id="cart-content">
+                        <div class="empty-cart-msg">
+                            Nenhuma moto foi selecionada ainda.<br>Navegue pelas categorias e clique em "Comprar".
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário de Pagamento -->
+                <div class="checkout-box">
+                    <h2>Dados do Comprador</h2>
+                    <form id="checkout-form" onsubmit="finishOrder(event)">
+                        <div class="form-group">
+                            <label for="name">Nome Completo *</label>
+                            <input type="text" id="name" required placeholder="Digite seu nome completo">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">E-mail *</label>
+                                <input type="email" id="email" required placeholder="seu@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefone / WhatsApp *</label>
+                                <input type="tel" id="phone" required placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment">Forma de Pagamento / Financiamento *</label>
+                            <select id="payment" required>
+                                <option value="">Selecione uma opção...</option>
+                                <option value="pix">Pix (5% de Desconto à vista)</option>
+                                <option value="cartao">Cartão de Crédito (até 18x)</option>
+                                <option value="financiamento">Financiamento Bancário (Entrada + Parcelas)</option>
+                                <option value="consorcio">Carta de Crédito / Consórcio</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Observações ou Preferências de Horário</label>
+                            <input type="text" id="notes" placeholder="Ex: Prefiro contato no período da tarde">
+                        </div>
+                        <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 1rem; margin-top: 10px;">Confirmar Reserva</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>Moto<span>Elite</span></h2>
+                <p>A maior concessionária digital de motocicletas de alta cilindrada.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#" onclick="showPage('esportivas')">Esportivas</a>
+                <a href="#" onclick="showPage('custom')">Custom</a>
+                <a href="#" onclick="showPage('trail')">Big Trail</a>
+                <a href="#" onclick="showPage('naked')">Naked</a>
+                <a href="#" onclick="showPage('scooter')">Scooters</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 MotoElite Concessionária Virtual S.A. Todos os direitos reservados. Imagens meramente ilustrativas.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentCart = null;
+
+        function showPage(pageId, element) {
+            // Esconde todas as páginas
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Remove classe ativa dos botões de navegação
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+
+            // Mostra a página solicitada
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Ativa o botão da nav correspondente
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // Tenta encontrar o botão correspondente se chamado via link externo
+                const activeBtn = Array.from(navBtns).find(btn => btn.getAttribute('onclick').includes(pageId));
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+
+            // Rola até o topo suavemente
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function buyMoto(title, price, imgSrc) {
+            currentCart = { title, price, imgSrc };
+            
+            // Atualiza o contador no header
+            document.getElementById('cart-count').innerText = '1';
+
+            // Atualiza a visualização do carrinho
+            const cartContainer = document.getElementById('cart-content');
+            cartContainer.innerHTML = `
+                <div class="selected-item-card">
+                    <img src="${imgSrc}" alt="${title}" class="selected-item-img">
+                    <div class="selected-item-info">
+                        <h3>${title}</h3>
+                        <p>R$ ${price.toLocaleString('pt-BR')},00</p>
+                    </div>
+                </div>
+                <div style="background: #111; padding: 15px; border-radius: 8px; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Valor do Veículo:</span>
+                        <span>R$ ${price.toLocaleString('pt-BR')},00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #22c55e;">
+                        <span>Frete / Preparação:</span>
+                        <span>GRÁTIS</span>
+                    </div>
+                    <hr style="border-color: #222; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; color: #fff;">
+                        <span>Total:</span>
+                        <span style="color: #e50914;">R$ ${price.toLocaleString('pt-BR')},00</span>
+                    </div>
+                </div>
+            `;
+
+            // Redireciona automaticamente para a página do carrinho
+            showPage('carrinho');
+        }
+
+        function finishOrder(event) {
+            event.preventDefault();
+            
+            if (!currentCart) {
+                alert('Por favor, selecione uma motocicleta antes de finalizar a compra!');
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            alert(`Parabéns, ${name}!
+
+Sua reserva para a ${currentCart.title} foi concluída com sucesso.
+Nossa equipe entrará em contato em breve para finalizar os detalhes de entrega!`);
+            
+            // Limpa o carrinho
+            currentCart = null;
+            document.getElementById('cart-count').innerText = '0';
+            document.getElementById('cart-content').innerHTML = `
+                <div class="empty-cart-msg">
+                    Nenhuma moto foi selecionada ainda.<br>Navegue pelas categorias e clique em "Comprar".
+                </div>
+            `;
+            document.getElementById('checkout-form').reset();
+
+            // Volta para a primeira página
+            showPage('esportivas');
+        }
+    </script>
+</body>
+</html>
+
